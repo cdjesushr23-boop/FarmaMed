@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FarmaMed</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#F2F6F7;--card:#fff;--ink:#12303A;--mut:#566B73;--line:#D5E0E3;--pri:#0E6B73;--pri2:#E3F1F2;--warn:#9A5B00;--warnbg:#FFF1D6;--bad:#A12A3A;--badbg:#FBE4E7;--ok:#1E7A4C;--okbg:#DDF3E6;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1A1E;--card:#15262B;--ink:#E4EFF1;--mut:#9DB3B9;--line:#2A4048;--pri:#5CC6CF;--pri2:#16363B;--warn:#F0B95A;--warnbg:#3A2C10;--bad:#F29AA6;--badbg:#3A1A20;--ok:#7FD6A5;--okbg:#14301F;color-scheme:dark}}:root[data-theme="dark"]{--bg:#0E1A1E;--card:#15262B;--ink:#E4EFF1;--mut:#9DB3B9;--line:#2A4048;--pri:#5CC6CF;--pri2:#16363B;--warn:#F0B95A;--warnbg:#3A2C10;--bad:#F29AA6;--badbg:#3A1A20;--ok:#7FD6A5;--okbg:#14301F;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Source Serif 4",Georgia,serif;line-height:1.2;margin:0 0 .5em}
+h1{font-size:clamp(1.9rem,6vw,3rem)}h2{font-size:1.5rem}h3{font-size:1.1rem}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+.demo{background:var(--warnbg);color:var(--warn);padding:8px 16px;font-size:.85rem;text-align:center;font-weight:500}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+nav{max-width:1000px;margin:auto;display:flex;align-items:center;gap:4px;padding:8px 12px;flex-wrap:wrap}
+.brand{font:700 1.3rem "Source Serif 4",serif;color:var(--pri);margin-right:auto;background:none;border:0;cursor:pointer}
+nav button.l{background:none;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--mut)}
+nav button.l[aria-current=page]{background:var(--pri2);color:var(--pri);font-weight:600}
+main{max-width:1000px;margin:auto;padding:20px 16px 60px}
+.hero{padding:28px 0 8px}.hero p{max-width:60ch;color:var(--mut);font-size:1.1rem}
+.search{display:flex;gap:8px;margin:18px 0}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+textarea{min-height:84px;resize:vertical}
+.btn{padding:10px 16px;border-radius:8px;border:1px solid var(--pri);background:var(--pri);color:var(--card);cursor:pointer;font-weight:600}
+.btn.s{background:transparent;color:var(--pri)}.btn.d{border-color:var(--bad);background:transparent;color:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.drug{text-align:left;cursor:pointer;width:100%}
+.drug:hover{border-color:var(--pri)}
+.chip{display:inline-block;font-size:.78rem;padding:2px 9px;border-radius:99px;background:var(--pri2);color:var(--pri);margin:2px 4px 2px 0;font-weight:500}
+.st-Borrador{background:var(--warnbg);color:var(--warn)}.st-En-revisión{background:var(--pri2);color:var(--pri)}.st-Aprobada{background:var(--okbg);color:var(--ok)}.st-Publicada{background:var(--ok);color:var(--card)}.st-Archivada{background:var(--line);color:var(--mut)}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin:16px 0;padding-bottom:0}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;white-space:nowrap;cursor:pointer;color:var(--mut)}
+.tabs button[aria-selected=true]{border-color:var(--pri);color:var(--pri);font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.alert{padding:12px 14px;border-radius:10px;margin:12px 0;font-size:.92rem}
+.alert.w{background:var(--warnbg);color:var(--warn)}.alert.b{background:var(--badbg);color:var(--bad)}.alert.o{background:var(--okbg);color:var(--ok)}
+.nd{color:var(--warn);font-style:italic}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:var(--card)}
+summary{cursor:pointer;font-weight:600}
+label{display:block;font-weight:500;margin:14px 0 4px}.help{font-size:.82rem;color:var(--mut);margin:0 0 4px}
+.err{color:var(--bad);font-size:.85rem}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.tw{overflow-x:auto}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;z-index:20}
+dl{display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:8px 14px}dt{font-weight:600}dd{margin:0}
+@media(max-width:560px){dl{grid-template-columns:1fr}.search{flex-direction:column}}
+@media(prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+.sub{margin-top:22px;padding-top:12px;border-top:1px solid var(--line)}
+.blk{border-left:4px solid var(--pri);padding-left:12px;margin:18px 0}
+.chk{display:flex;gap:8px;align-items:center;font-weight:400;margin:10px 0}.chk input{width:auto}
+dl{margin:8px 0}fieldset{border:0;padding:0;margin:0}
+</style>
+</head>
+<body>
+<div class="demo">FarmaMed · Etapa 3b: conectada a Supabase. Contenido educativo en construcción: no lo uses como fuente verificada.</div>
+<header><nav aria-label="Principal">
+<button class="brand" onclick="go('home')">FarmaMed</button>
+<button class="l" data-v="home" onclick="go('home')">Inicio</button>
+<button class="l" data-v="lib" onclick="go('lib')">Biblioteca</button>
+<button class="l" data-v="admin" onclick="go('admin')">Administración</button>
+<button class="l" data-v="ajustes" onclick="go('ajustes')">Ajustes</button>
+</nav></header>
+<main id="app"></main>
+<script>
+const GROUPS=[];
+const FLOW=['Borrador','En revisión','Aprobada','Publicada','Archivada'];
+let S={v:'home',q:'',g:'',id:null,tab:0,pt:0,aq:'',theme:'auto',fav:new Set(),logged:false,toast:'',prev:false,errs:[],work:null,dirty:false,user:null,rol:null,fatal:'',busy:false};
+const hoy=()=>new Date().toISOString().slice(0,10);const nid=()=>crypto.randomUUID();
+const eE=()=>({id:nid(),edad:'',dosis:'',mgkg:'',tipoMgkg:'',peso:'',via:'',intervalo:'',maxDosis:'',maxDia:'',duracion:'',renal:'',hepatico:'',embarazo:'',prec:'',refId:''});
+const eI=()=>({id:nid(),enfermedad:'',objetivo:'',tipo:'',visible:true,esquemas:[eE()]});
+const eR=()=>({id:nid(),tipo:'',autor:'',titulo:'',fuente:'',edicion:'',capitulo:'',paginas:'',anio:'',doi:'',consulta:'',apartados:'',verificada:false});
+const mk=o=>Object.assign({id:nid(),estado:'Borrador',demo:false,indicaciones:[],refs:[],creado:hoy(),actualizado:hoy()},o);
+let D=[],GMAP=[];
+const I='i',X='t';
+const T=[
+['A. Identificación',[['generico','Nombre genérico *',I,'Obligatorio'],['sinonimos','Sinónimos',I],['comerciales','Nombres comerciales',I,'Solo si corresponde'],['clase','Grupo farmacológico','s','',GROUPS],['sub','Subgrupo',I],['atc','Código ATC',I,'Si está disponible'],['sistema','Sistema o aparato',I],['presentaciones','Presentaciones',X],['vias','Vías de administración',I],['indic','Indicaciones principales (resumen)',X],['tags','Etiquetas de búsqueda',I,'Separadas por comas']]],
+['B. Farmacología',[['mec','Mecanismo de acción detallado',X],['simple','Explicación simplificada',X],['diana','Diana farmacológica',I,'Receptor, enzima, canal iónico, transportador…'],['efectos','Efectos farmacológicos',X],['fd','Farmacodinamia',X],['dosisresp','Relación dosis-respuesta',X,'Si corresponde']]],
+['C. Farmacocinética',[['#','Absorción'],['abs_bio','Biodisponibilidad',I],['abs_via','Vía y formulación',I],['abs_alim','Efecto de los alimentos',I],['#','Distribución'],['dist_vd','Volumen de distribución',I],['dist_ppb','Unión a proteínas plasmáticas',I],['dist_tej','Distribución a tejidos relevantes',I],['#','Metabolismo'],['met_org','Órganos',I],['met_enz','Enzimas (p. ej., CYP450)',I],['met_act','Metabolitos activos o tóxicos',I],['met_clin','Aspectos clínicos relevantes',X],['#','Eliminación'],['el_via','Vía de eliminación',I],['el_cl','Aclaramiento',I],['el_t12','Semivida de eliminación',I],['el_aj','Ajustes renales o hepáticos',X],['#','Parámetros temporales'],['t_inicio','Inicio del efecto',I],['t_tmax','Tmax (tiempo a la concentración plasmática máxima)',I,'No es el tiempo hasta el efecto clínico máximo.'],['t_efmax','Tiempo hasta el efecto clínico máximo',I],['t_cmax','Cmax',I],['t_dur','Duración del efecto',I],['t_ee','Tiempo hasta el estado estacionario',I],['t_ctx','Contexto de los parámetros',X,'Vía, formulación, dosis y población a las que corresponden.']]],
+['D. Indicaciones y dosis',[]],
+['E. Seguridad',[['frec','Efectos adversos frecuentes',X],['graves','Efectos adversos graves',X],['cabs','Contraindicaciones absolutas',X],['crel','Contraindicaciones relativas',X],['prec','Precauciones',X,'Una precaución no es una contraindicación absoluta.'],['inter','Interacciones farmacológicas',X],['alim','Interacciones con alimentos',X],['tox','Toxicidad y signos de alarma',X]]],
+['F. Referencias',[]],
+['G. Revisión editorial',[['rev_editor','Editor',I],['rev_revisor','Revisor',I],['rev_verif','Estado de verificación','s','',['Sin verificar','En verificación','Verificada']],['rev_pend','Apartados pendientes',X],['rev_prox','Fecha sugerida de próxima revisión','d'],['rev_notas','Notas internas (no se muestran a estudiantes)',X]]]];
+const ESQ=[['edad','Grupo de edad',I],['dosis','Dosis por administración',I,'Con unidad explícita (mg, µg, UI…)'],['mgkg','Dosis por kg',I,'Solo si corresponde'],['tipoMgkg','Tipo de dosis por kg','s','',['mg/kg/dosis','mg/kg/día']],['peso','Peso o intervalo de peso',I],['via','Vía de administración',I],['intervalo','Intervalo entre dosis',I],['maxDosis','Dosis máxima por administración',I],['maxDia','Dosis máxima diaria',I],['duracion','Duración del tratamiento',I],['renal','Ajuste por función renal',I],['hepatico','Ajuste por función hepática',I],['embarazo','Embarazo y lactancia',I],['prec','Precauciones especiales',X]];
+const REF=[['tipo','Tipo de fuente','s','',['Libro de texto','Artículo científico','Guía de práctica clínica','Ficha técnica oficial','Otro']],['autor','Autor o institución',I],['titulo','Título',I],['fuente','Libro o revista',I],['edicion','Edición',I],['capitulo','Capítulo',I],['paginas','Páginas',I],['anio','Año',I],['doi','DOI o URL',I,'No inventes enlaces'],['consulta','Fecha de consulta','d'],['apartados','Apartados que respalda',I]];
+const $=s=>document.querySelector(s),e=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function go(v,id){if(S.work&&S.dirty){S.errs=['Tienes cambios sin guardar. Pulsa «Guardar borrador» o «Descartar cambios».'];render();scrollTo(0,0);return}S.work=null;S.v=v;S.id=id??S.id;S.tab=0;S.prev=false;S.errs=[];render();scrollTo(0,0)}
+function toast(t){S.toast=t;render();setTimeout(()=>{S.toast='';render()},2200)}
+function pub(){return D.filter(d=>d.estado==='Publicada')}
+function match(d){const q=S.q.toLowerCase();return(!S.g||d.clase===S.g)&&(!q||[d.generico,d.sinonimos,d.comerciales,d.clase,d.indic,d.tags].join(' ').toLowerCase().includes(q))}
+function card(d){return`<button class="card drug" onclick="go('drug','${d.id}')"><h3>${e(d.generico)}</h3><span class="chip">${e(d.clase)}</span><p style="margin:6px 0 0;color:var(--mut);font-size:.9rem">${e(d.indic)||'Sin indicación registrada'}</p>${d.demo?'<span class="chip" style="background:var(--warnbg);color:var(--warn)">Ejemplo demostrativo</span>':''}</button>`}
+function home(){const l=pub();return`<section class="hero"><h1>Farmacología para estudiar con rigor</h1><p>Fichas de medicamentos con mecanismo, farmacocinética, dosis y seguridad, ligadas a sus fuentes. Contenido educativo; no sustituye la valoración médica.</p>
+<form class="search" role="search" onsubmit="event.preventDefault();S.q=$('#q').value;go('lib')"><input id="q" aria-label="Buscar medicamento" placeholder="Busca por nombre, clase o indicación"><button class="btn">Buscar</button></form></section>
+<h2>Grupos farmacológicos</h2><div class="grid">${GROUPS.map(g=>`<button class="card drug" onclick="S.g='${g}';go('lib')"><h3>${g}</h3><span style="color:var(--mut)">${l.filter(d=>d.clase===g).length} fichas publicadas</span></button>`).join('')}</div>
+<h2 style="margin-top:28px">Favoritos</h2><div class="grid">${l.filter(d=>S.fav.has(d.id)).map(card).join('')||'<p>Marca una ficha con la estrella para verla aquí.</p>'}</div>`}
+function lib(){const l=pub().filter(match);return`<h2>Biblioteca</h2><div class="alert w">Solo se muestran fichas con estado Publicada. Las de borrador o revisión permanecen ocultas.</div>
+<div class="search"><input id="lq" aria-label="Buscar" placeholder="Nombre, sinónimo, indicación…" value="${e(S.q)}" oninput="S.q=this.value;render(true)"><select aria-label="Grupo" onchange="S.g=this.value;render(true)"><option value="">Todos los grupos</option>${GROUPS.map(g=>`<option ${S.g===g?'selected':''}>${g}</option>`).join('')}</select></div>
+<div class="grid">${l.map(card).join('')||'<p>Sin resultados. Prueba con otro término.</p>'}</div>`}
+
+const cur=()=>S.work;
+const gp=p=>p.split('.').reduce((o,k)=>o==null?o:o[k],cur());
+const sp=(p,v)=>{S.dirty=true;const k=p.split('.'),l=k.pop();k.reduce((a,b)=>a[b],cur())[l]=v};
+function fld(b,k,l,t,h,o){const p=b?b+'.'+k:k,v=gp(p),id='f_'+p.replace(/\./g,'_');let c;
+if(t==='t')c=`<textarea id="${id}" oninput="sp('${p}',this.value)">${e(v)}</textarea>`;
+else if(t==='s')c=`<select id="${id}" onchange="sp('${p}',this.value)"><option value="">—</option>${o.map(x=>{const a=x.v??x,n=x.l??x;return`<option value="${e(a)}" ${String(v)===String(a)?'selected':''}>${e(n)}</option>`}).join('')}</select>`;
+else c=`<input id="${id}" type="${t==='d'?'date':'text'}" value="${e(v)}" oninput="sp('${p}',this.value)">`;
+return`<label for="${id}">${l}</label>${h?`<p class="help">${h}</p>`:''}${c}`}
+const chk=(p,l)=>`<label class="chk"><input type="checkbox" ${gp(p)?'checked':''} onchange="sp('${p}',this.checked)"> ${l}</label>`;
+const ft=(a,b)=>a.map(([k,l,t,h,o])=>k==='#'?`<h3 class="sub">${l}</h3>`:fld(b||'',k,l,t,h,o)).join('');
+const refOpts=d=>d.refs.map((r,n)=>({v:r.id,l:`Fuente ${n+1}: ${r.autor||'sin autor'} ${r.anio||''}`}));
+function dTab(d){return(d.indicaciones.map((x,i)=>{const b='indicaciones.'+i;return`<div class="blk"><div class="row"><h3 style="margin:0;margin-right:auto">Indicación ${i+1}</h3><button class="btn d" onclick="del('indicaciones',${i})">Eliminar indicación</button></div>${fld(b,'enfermedad','Enfermedad o indicación',I)}${fld(b,'objetivo','Objetivo terapéutico',I)}${fld(b,'tipo','Tipo de uso','s','Solo si lo respalda la fuente',['Primera línea','Alternativa','Complementario'])}${chk(b+'.visible','Mostrar esta indicación a los estudiantes')}
+${x.esquemas.map((s,j)=>`<details open><summary>Esquema de dosis ${j+1}</summary>${ft(ESQ,b+'.esquemas.'+j)}${fld(b+'.esquemas.'+j,'refId','Fuente que respalda este esquema','s','Agrega primero las fuentes en la pestaña F',refOpts(d))}<button class="btn d" style="margin-top:12px" onclick="del('${b}.esquemas',${j})">Eliminar esquema</button></details>`).join('')}<button class="btn s" onclick="add('${b}.esquemas')">Agregar esquema de dosis</button></div>`}).join('')||'<p>Aún no hay indicaciones.</p>')+`<button class="btn" onclick="add('indicaciones')">Agregar indicación</button>`}
+function rTab(d){return(d.refs.map((r,i)=>`<div class="blk"><div class="row"><h3 style="margin:0;margin-right:auto">Fuente ${i+1}</h3><button class="btn d" onclick="del('refs',${i})">Eliminar fuente</button></div>${ft(REF,'refs.'+i)}${chk('refs.'+i+'.verificada','Confirmo que consulté esta fuente')}</div>`).join('')||'<p>Aún no hay fuentes.</p>')+`<button class="btn" onclick="add('refs')">Agregar fuente</button>`}
+function add(p){S.dirty=true;gp(p).push(p.endsWith('esquemas')?eE():p==='refs'?eR():eI());render(true)}
+function del(p,i){const a=gp(p);if(p==='refs'){const id=a[i].id;cur().indicaciones.forEach(x=>x.esquemas.forEach(s=>{if(s.refId==id)s.refId=''}))}a.splice(i,1);S.dirty=true;render(true)}
+const nv=v=>v&&String(v).trim()?e(v):'<span class="nd">Dato no verificado</span>';
+const dl=r=>`<dl>${r.map(([a,b])=>`<dt>${a}</dt><dd>${nv(b)}</dd>`).join('')}</dl>`;
+const fl=(a,d)=>a.map(([k,l])=>k==='#'?`<h3>${l}</h3>`:dl([[l,d[k]]])).join('');
+const refTxt=(d,id)=>{const r=d.refs.find(x=>x.id==id);return r?`${e(r.autor||'Autor no indicado')} (${e(r.anio||'s. f.')}). ${e(r.titulo||'Sin título')}${r.verificada?'':' <span class="chip st-Borrador">Sin confirmar</span>'}`:'<span class="nd">Dato no verificado</span>'};
+const STAB=['Resumen','Mecanismo','Farmacocinética','Indicaciones y dosis','Seguridad','Referencias'];
+const tb=(c,s)=>`<div class="tabs" role="tablist">${STAB.map((t,i)=>`<button role="tab" aria-selected="${c===i}" onclick="${s}=${i};render(true)">${t}</button>`).join('')}</div>`;
+function stud(d,t){
+if(t===0)return`<p><span class="chip">${e(d.clase)}</span>${d.sub?`<span class="chip">${e(d.sub)}</span>`:''}</p>`+dl([['Usos principales',d.indic],['Explicación simple',d.simple],['Presentaciones',d.presentaciones],['Vías',d.vias],['Código ATC',d.atc],['Nombres comerciales',d.comerciales],['Sinónimos',d.sinonimos],['Sistema o aparato',d.sistema]]);
+if(t===1)return fl(T[1][1],d);
+if(t===2)return`<div class="alert w">Tmax (concentración plasmática máxima) no equivale al tiempo hasta el efecto clínico máximo.</div>`+fl(T[2][1],d);
+if(t===3){const v=d.indicaciones.filter(i=>i.visible);return`<div class="alert w">Contenido educativo; no es una indicación individual de tratamiento. Lo que falta aparece como “Dato no verificado”.</div>`+(v.map(i=>`<div class="card" style="margin:12px 0"><h3>${nv(i.enfermedad)}</h3>${dl([['Objetivo terapéutico',i.objetivo],['Tipo de uso',i.tipo]])}${i.esquemas.map((s,j)=>`<details open><summary>Esquema ${j+1}: ${nv(s.edad)}</summary>${dl([['Dosis por administración',s.dosis],['Dosis por kg',s.mgkg?s.mgkg+' ('+(s.tipoMgkg||'tipo no especificado')+')':''],['Peso aplicable',s.peso],['Vía',s.via],['Intervalo',s.intervalo],['Máx. por administración',s.maxDosis],['Máx. diaria',s.maxDia],['Duración',s.duracion],['Ajuste renal',s.renal],['Ajuste hepático',s.hepatico],['Embarazo y lactancia',s.embarazo],['Precauciones',s.prec]])}<dl><dt>Fuente</dt><dd>${refTxt(d,s.refId)}</dd></dl></details>`).join('')}</div>`).join('')||'<p>Sin indicaciones registradas.</p>')}
+if(t===4)return fl(T[4][1],d);
+return d.refs.length?`<ol>${d.refs.map(r=>`<li>${e(r.autor||'Autor no indicado')}. ${e(r.titulo||'Sin título')}. ${e(r.fuente)}${r.edicion?', '+e(r.edicion):''}${r.capitulo?', cap. '+e(r.capitulo):''}${r.paginas?', pp. '+e(r.paginas):''}${r.anio?' ('+e(r.anio)+')':''}${r.doi?'. '+e(r.doi):''}${r.verificada?'':' <span class="chip st-Borrador">Sin confirmar como consultada</span>'}</li>`).join('')}</ol>`:'<p class="nd">Sin fuentes registradas.</p>'}
+function drug(){const d=D.find(x=>x.id===S.id);if(!d||d.estado!=='Publicada')return`<p>Ficha no disponible.</p><button class="btn s" onclick="go('lib')">Volver</button>`;
+return`<button class="btn s" onclick="go('lib')">Volver</button><div class="row" style="margin-top:14px"><h1 style="margin:0">${e(d.generico)}</h1><button class="btn s" aria-pressed="${S.fav.has(d.id)}" onclick="S.fav.has('${d.id}')?S.fav.delete('${d.id}'):S.fav.add('${d.id}');render(true)">${S.fav.has(d.id)?'★ Favorita':'☆ Marcar favorita'}</button></div>${d.demo?'<span class="chip">Ejemplo demostrativo</span>':''}${tb(S.tab,'S.tab')}${stud(d,S.tab)}<p class="help" style="margin-top:24px">Información educativa. No sustituye la valoración médica.</p>`}
+function check(d,l){const x=[],n=(d.generico||'').trim();
+if(!n)x.push('Escribe el nombre genérico (pestaña A).');else if(D.some(o=>o.id!==d.id&&(o.generico||'').trim().toLowerCase()===n.toLowerCase()))x.push('Ya existe una ficha llamada “'+n+'”. Edítala en lugar de crear un duplicado.');
+if(l>=3){if(!d.refs.length)x.push('Agrega al menos una fuente (pestaña F).');
+d.indicaciones.forEach((i,a)=>i.esquemas.forEach((s,b)=>{const w=`Indicación ${a+1}, esquema ${b+1}: `;if(s.dosis.trim()){if(!s.edad.trim())x.push(w+'indica el grupo de edad.');if(!s.via.trim())x.push(w+'indica la vía.');if(!d.refs.some(r=>r.id==s.refId))x.push(w+'elige la fuente que respalda la dosis.')}}));
+if(d.refs.some(r=>!r.verificada))x.push('Hay fuentes sin confirmar como consultadas (pestaña F).')}
+return x}
+function fail(){render();scrollTo(0,0)}
+const clone=o=>JSON.parse(JSON.stringify(o));
+const SB_URL='https://uwtezfpgafzwrnhpumme.supabase.co',SB_KEY='sb_publishable_LnGZlNyjyvBYjpy8TgHFOg_Np7olQ5i';
+let sb=null;try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(_){S.fatal='No se cargó la librería de Supabase (revisa tu conexión).'}
+const DBE=['borrador','en_revision','aprobada','publicada','archivada'];
+const PKK=T[2][1].filter(x=>x[0]!=='#').map(x=>x[0]),SEGK=T[4][1].map(x=>x[0]);
+const EMB='*,farmacocinetica(*),seguridad(*),revision_editorial(*),referencias(*),indicaciones(*,esquemas_dosis(*))';
+const nz=v=>v==null||String(v).trim()===''?null:v,lst=s=>String(s||'').split(',').map(x=>x.trim()).filter(Boolean),arr=a=>(a||[]).join(', '),v0=v=>v==null?'':v;
+const pick=(o,ks)=>Object.fromEntries(ks.map(k=>[k,nz(o[k])])),unp=(o,ks)=>Object.fromEntries(ks.map(k=>[k,v0((o||{})[k])]));
+const byOrd=(a,b)=>(a.orden||0)-(b.orden||0);
+function toUI(r){const g=GMAP.find(x=>x.id===r.grupo_id),v=r.revision_editorial||{};
+return{id:r.id,estado:FLOW[DBE.indexOf(r.estado)],demo:false,generico:r.nombre_generico,sinonimos:arr(r.sinonimos),comerciales:arr(r.nombres_comerciales),clase:g?g.nombre:'',sub:v0(r.subgrupo),atc:v0(r.atc),sistema:v0(r.sistema),presentaciones:v0(r.presentaciones),vias:v0(r.vias),indic:v0(r.indicaciones_resumen),tags:arr(r.etiquetas),mec:v0(r.mecanismo),simple:v0(r.mecanismo_simple),diana:v0(r.diana),efectos:v0(r.efectos_farmacologicos),fd:v0(r.farmacodinamia),dosisresp:v0(r.dosis_respuesta),
+...unp(r.farmacocinetica,PKK),...unp(r.seguridad,SEGK),rev_editor:v0(v.editor),rev_revisor:v0(v.revisor),rev_verif:v0(v.estado_verificacion),rev_pend:v0(v.apartados_pendientes),rev_prox:v0(v.proxima_revision),rev_notas:v0(v.notas_internas),
+creado:String(r.creado).slice(0,10),actualizado:String(r.actualizado).slice(0,10),
+refs:(r.referencias||[]).map(x=>({id:x.id,tipo:v0(x.tipo),autor:v0(x.autor),titulo:v0(x.titulo),fuente:v0(x.fuente),edicion:v0(x.edicion),capitulo:v0(x.capitulo),paginas:v0(x.paginas),anio:v0(x.anio),doi:v0(x.doi_url),consulta:v0(x.fecha_consulta),apartados:v0(x.apartados),verificada:!!x.verificada})),
+indicaciones:(r.indicaciones||[]).slice().sort(byOrd).map(i=>({id:i.id,enfermedad:v0(i.enfermedad),objetivo:v0(i.objetivo),tipo:v0(i.tipo_uso),visible:i.visible!==false,esquemas:(i.esquemas_dosis||[]).slice().sort(byOrd).map(e=>({id:e.id,edad:v0(e.grupo_edad),dosis:v0(e.dosis_por_administracion),mgkg:v0(e.dosis_por_kg),tipoMgkg:v0(e.tipo_dosis_kg),peso:v0(e.peso),via:v0(e.via),intervalo:v0(e.intervalo),maxDosis:v0(e.dosis_max_administracion),maxDia:v0(e.dosis_max_diaria),duracion:v0(e.duracion),renal:v0(e.ajuste_renal),hepatico:v0(e.ajuste_hepatico),embarazo:v0(e.embarazo_lactancia),prec:v0(e.precauciones),refId:v0(e.referencia_id)}))}))}}
+function fromUI(d,est){const g=GMAP.find(x=>x.nombre===d.clase);
+return{id:d.id,estado:DBE[FLOW.indexOf(est)],nombre_generico:(d.generico||'').trim(),sinonimos:lst(d.sinonimos),nombres_comerciales:lst(d.comerciales),grupo_id:g?g.id:null,subgrupo:nz(d.sub),atc:nz(d.atc),sistema:nz(d.sistema),presentaciones:nz(d.presentaciones),vias:nz(d.vias),indicaciones_resumen:nz(d.indic),etiquetas:lst(d.tags),mecanismo:nz(d.mec),mecanismo_simple:nz(d.simple),diana:nz(d.diana),efectos_farmacologicos:nz(d.efectos),farmacodinamia:nz(d.fd),dosis_respuesta:nz(d.dosisresp),
+farmacocinetica:pick(d,PKK),seguridad:pick(d,SEGK),revision_editorial:{editor:nz(d.rev_editor),revisor:nz(d.rev_revisor),estado_verificacion:d.rev_verif||'Sin verificar',apartados_pendientes:nz(d.rev_pend),proxima_revision:nz(d.rev_prox),notas_internas:nz(d.rev_notas)},
+referencias:d.refs.map(r=>({id:r.id,tipo:nz(r.tipo),autor:nz(r.autor),titulo:nz(r.titulo),fuente:nz(r.fuente),edicion:nz(r.edicion),capitulo:nz(r.capitulo),paginas:nz(r.paginas),anio:nz(r.anio),doi_url:nz(r.doi),fecha_consulta:nz(r.consulta),apartados:nz(r.apartados),verificada:!!r.verificada})),
+indicaciones:d.indicaciones.map((i,n)=>({id:i.id,enfermedad:nz(i.enfermedad),objetivo:nz(i.objetivo),tipo_uso:nz(i.tipo),visible:!!i.visible,orden:n,esquemas_dosis:i.esquemas.map((s,j)=>({id:s.id,orden:j,grupo_edad:nz(s.edad),dosis_por_administracion:nz(s.dosis),dosis_por_kg:nz(s.mgkg),tipo_dosis_kg:nz(s.tipoMgkg),peso:nz(s.peso),via:nz(s.via),intervalo:nz(s.intervalo),dosis_max_administracion:nz(s.maxDosis),dosis_max_diaria:nz(s.maxDia),duracion:nz(s.duracion),ajuste_renal:nz(s.renal),ajuste_hepatico:nz(s.hepatico),embarazo_lactancia:nz(s.embarazo),precauciones:nz(s.prec),referencia_id:nz(s.refId)}))}))}}
+async function load(){if(!sb)return render(true);const [g,m]=await Promise.all([sb.from('grupos_farmacologicos').select('*').order('nombre'),sb.from('medicamentos').select(EMB).order('nombre_generico')]);
+const er=g.error||m.error;if(er)S.fatal=er.message;else{S.fatal='';GMAP=g.data;GROUPS.length=0;g.data.forEach(x=>GROUPS.push(x.nombre));D=m.data.map(toUI)}render(true)}
+async function setUser(u){S.user=u||null;S.rol=null;if(u&&sb){const r=await sb.from('perfiles').select('rol').eq('id',u.id).single();S.rol=(r.data&&r.data.rol)||'estudiante'}S.logged=S.rol==='admin';await load()}
+async function session(){if(!sb)return;const r=await sb.auth.getSession();await setUser(r.data.session?r.data.session.user:null)}
+const msg=m=>/Invalid login/i.test(m)?'Correo o contraseña incorrectos.':/already registered/i.test(m)?'Ese correo ya tiene cuenta.':/at least 6/i.test(m)?'La contraseña debe tener al menos 6 caracteres.':m;
+async function login(up){S.errs=[];const em=$('#em').value.trim(),pw=$('#pw').value;if(!em||!pw){S.errs=['Escribe tu correo y contraseña.'];return render()}
+const r=up?await sb.auth.signUp({email:em,password:pw}):await sb.auth.signInWithPassword({email:em,password:pw});
+if(r.error){S.errs=[msg(r.error.message)];return render()}
+if(!r.data.session){S.errs=['Cuenta creada. Confirma tu correo y luego inicia sesión.'];return render()}
+await setUser(r.data.session.user)}
+async function logout(){if(sb)await sb.auth.signOut();S.work=null;S.dirty=false;S.v='home';await setUser(null)}
+function gate(){if(S.user)return`<div class="card" style="max-width:420px;margin:30px auto"><h2>Sin acceso</h2><p>La cuenta ${e(S.user.email)} es de estudiante. Solo los administradores entran al panel.</p><button class="btn s" onclick="logout()">Cerrar sesión</button></div>`;
+return`<form class="card" style="max-width:420px;margin:30px auto" onsubmit="event.preventDefault();login(false)"><h2>Iniciar sesión</h2>${S.errs.length?`<div class="alert b" role="alert">${e(S.errs[0])}</div>`:''}<label for="em">Correo</label><input id="em" type="email" autocomplete="username"><label for="pw">Contraseña</label><input id="pw" type="password" autocomplete="current-password"><div class="row" style="margin-top:14px"><button class="btn">Entrar</button><button type="button" class="btn s" onclick="login(true)">Crear cuenta de estudiante</button></div><p class="help">El acceso administrativo lo decide la base de datos, no esta página.</p></form>`}
+const cuenta=()=>`<div class="card" style="margin-top:12px"><h3>Cuenta</h3>${S.user?`<p>${e(S.user.email)} (${S.rol})</p><button class="btn s" onclick="logout()">Cerrar sesión</button>`:`<p>No has iniciado sesión.</p><button class="btn" onclick="go('admin')">Iniciar sesión</button>`}</div>`;
+function back(){if(S.dirty){S.errs=['Tienes cambios sin guardar. Pulsa «Guardar borrador» o «Descartar cambios».'];return fail()}go('admin')}
+async function persist(d,est,ok){if(S.busy)return;S.busy=true;const r=await sb.rpc('guardar_ficha',{p:fromUI(d,est)});S.busy=false;
+if(r.error){S.errs=[r.error.code==='23505'?'Ya existe una ficha con ese nombre.':r.error.message];return fail()}
+d.estado=est;d.actualizado=hoy();S.dirty=false;await load();toast(ok)}
+async function save(){const d=cur();S.errs=check(d,0);if(S.errs.length)return fail();const was=d.estado;
+await persist(d,was==='Archivada'?'Archivada':'Borrador',was==='Archivada'?'Guardado; sigue archivada':was==='Borrador'?'Guardado en tu base de datos':'Guardada como borrador: ya no es visible para estudiantes')}
+async function adv(n){const d=cur();S.errs=check(d,n>=2&&n<=3?3:0);if(S.errs.length)return fail();await persist(d,FLOW[n],'Estado: '+FLOW[n])}
+function edit(id,w){S.work=w||clone(D.find(x=>x.id===id));S.dirty=false;S.id=id;S.v='edit';S.tab=0;S.pt=0;S.prev=false;S.errs=[];render();scrollTo(0,0)}
+function newD(){const d=mk({clase:GROUPS[0]||''});edit(d.id,d)}
+function editor(){const d=cur();if(!d){S.v='admin';return admin()}const i=FLOW.indexOf(d.estado);
+const body=S.tab===3?dTab(d):S.tab===5?rTab(d):(S.tab===6?`<p class="help">Creada: ${d.creado}. Actualizada: ${d.actualizado}.</p>`:'')+ft(T[S.tab][1]);
+return`<div class="row"><button class="btn s" onclick="back()">Volver al panel</button>${S.dirty?'<button class="btn d" onclick="S.dirty=false;go(\'admin\')">Descartar cambios</button>':''}</div><div class="row" style="margin-top:12px"><h2 style="margin:0">${e(d.generico)||'Ficha nueva'}</h2><span class="chip st-${d.estado.replace(' ','-')}">${d.estado}</span>${S.dirty?'<span class="chip st-Borrador">Cambios sin guardar</span>':''}</div>
+
+<div class="tabs" role="tablist">${T.map((t,n)=>`<button role="tab" aria-selected="${S.tab===n}" onclick="S.tab=${n};render(true)">${t[0]}</button>`).join('')}</div>
+${S.errs.length?`<div class="alert b" role="alert"><b>Corrige esto:</b><ul>${S.errs.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`:''}<div class="card">${body}</div>
+<div class="row" style="margin-top:16px"><button class="btn" onclick="save()">Guardar borrador</button><button class="btn s" onclick="S.prev=!S.prev;render(true)">${S.prev?'Ocultar vista previa':'Previsualizar'}</button>
+${i<3?`<button class="btn s" onclick="adv(${i+1})">${['','Enviar a revisión','Aprobar','Publicar'][i+1]}</button>`:''}${i===4?`<button class="btn s" onclick="adv(0)">Restaurar a borrador</button>`:''}${i===3?`<button class="btn d" onclick="adv(0)">Despublicar</button>`:''}${i!==4?`<button class="btn d" onclick="adv(4)">Archivar</button>`:''}</div>
+${S.prev?`<div class="card" style="margin-top:16px"><div class="alert w">Vista previa: así la verá el estudiante.</div><h2>${e(d.generico)||'(sin nombre)'}</h2>${tb(S.pt,'S.pt')}${stud(d,S.pt)}</div>`:''}`}
+function admin(){if(!S.logged)return gate();
+if(S.v==='edit')return editor();const q=S.aq.toLowerCase(),l=D.filter(d=>!q||[d.generico,d.sinonimos].join(' ').toLowerCase().includes(q));
+return`<div class="row"><h2 style="margin:0;margin-right:auto">Panel de fichas</h2><button class="btn" onclick="newD()">Nueva ficha</button></div>
+<label for="aq">Buscar ficha (para evitar duplicados)</label><input id="aq" value="${e(S.aq)}" oninput="S.aq=this.value;render(true)">
+<div class="tw"><table><thead><tr><th>Fármaco</th><th>Estado</th><th></th></tr></thead><tbody>${l.map(d=>`<tr><td>${e(d.generico)||'(sin nombre)'}</td><td><span class="chip st-${d.estado.replace(' ','-')}">${d.estado}</span></td><td><button class="btn s" onclick="edit('${d.id}')">Editar</button></td></tr>`).join('')}</tbody></table></div><p class="help">Solo las fichas Publicadas aparecen en la biblioteca.</p>`}
+function applyTheme(){const r=document.documentElement;S.theme==='auto'?r.removeAttribute('data-theme'):r.setAttribute('data-theme',S.theme)}
+function setTheme(v){S.theme=v;applyTheme();try{localStorage.setItem('fm-theme',v)}catch(_){}render(true)}
+function ajustes(){return`<h2>Ajustes</h2><div class="card"><fieldset><legend><h3>Tema</h3></legend>${[['auto','Automático (según tu dispositivo)'],['light','Claro'],['dark','Oscuro']].map(([v,l])=>`<label class="chk"><input type="radio" name="th" ${S.theme===v?'checked':''} onchange="setTheme('${v}')"> ${l}</label>`).join('')}</fieldset></div>${cuenta()}`}
+function render(keep){const y=scrollY,v=S.v==='edit'?'admin':S.v==='drug'?'lib':S.v;
+document.querySelectorAll('nav .l').forEach(b=>b.dataset.v===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+const a=document.activeElement,id=a&&a.id,pos=a&&a.selectionStart;
+$('#app').innerHTML=(S.fatal?`<div class="alert b" role="alert">No se pudo usar la base de datos: ${e(S.fatal)}</div>`:'')+({home,lib,drug,admin,edit:admin,ajustes})[S.v]()+(S.toast?`<div class="toast" role="status">${S.toast}</div>`:'');
+if(id&&$('#'+id)){$('#'+id).focus();try{$('#'+id).setSelectionRange(pos,pos)}catch(_){}}if(keep)scrollTo(0,y)}
+try{S.theme=localStorage.getItem('fm-theme')||'auto'}catch(_){}
+applyTheme();render();session();
+</script>
+</body>
+</html>
